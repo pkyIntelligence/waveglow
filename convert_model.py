@@ -72,4 +72,4 @@ if __name__ == '__main__':
     new_model_path = sys.argv[2]
     model = torch.load(old_model_path)
     model['model'] = update_model(model['model'])
-    torch.save(model.save_dict(), new_model_path)
+    torch.save(model['model'].state_dict(), new_model_path)
