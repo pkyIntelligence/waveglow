@@ -90,6 +90,7 @@ class Invertible1x1Conv(torch.nn.Module):
                 # Reverse computation
                 W_inverse = W.float().inverse()
                 W_inverse = Variable(W_inverse[..., None])
+
                 if z.type() == 'torch.cuda.HalfTensor':
                     W_inverse = W_inverse.half()
                 self.W_inverse = W_inverse
@@ -262,7 +263,7 @@ class WaveGlow(torch.nn.Module):
                                           self.n_remaining_channels,
                                           spect.size(2)).normal_()
         else:
-            audio = torch.cuda.FloatTensor(spect.size(0),
+            audio = torch.FloatTensor(spect.size(0),
                                            self.n_remaining_channels,
                                            spect.size(2)).normal_()
 
@@ -286,7 +287,7 @@ class WaveGlow(torch.nn.Module):
                 if spect.type() == 'torch.cuda.HalfTensor':
                     z = torch.cuda.HalfTensor(spect.size(0), self.n_early_size, spect.size(2)).normal_()
                 else:
-                    z = torch.cuda.FloatTensor(spect.size(0), self.n_early_size, spect.size(2)).normal_()
+                    z = torch.FloatTensor(spect.size(0), self.n_early_size, spect.size(2)).normal_()
                 audio = torch.cat((sigma*z, audio),1)
 
         audio = audio.permute(0,2,1).contiguous().view(audio.size(0), -1).data
