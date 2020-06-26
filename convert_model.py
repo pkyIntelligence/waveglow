@@ -2,6 +2,9 @@ import sys
 import copy
 import torch
 
+from functools import partial
+import pickle
+
 
 def _check_model_old_version(model):
     if hasattr(model.WN[0], 'res_layers') or hasattr(model.WN[0], 'cond_layers'):
@@ -68,9 +71,13 @@ def update_model(old_model):
 
 
 if __name__ == '__main__':
+    # workaround for python3 pickling issue
+    pickle.load = partial(pickle.load, encoding="latin1")
+    pickle.Unpickler = partial(pickle.Unpickler, encoding="latin1")
+
     old_model_path = sys.argv[1]
     new_model_path = sys.argv[2]
     device = sys.argv[3]
-    model = torch.load(old_model_path, map_location=torch.device(device))
+    model = torch.load(old_model_path, map_location=torch.device(device), pickle_module=pickle)
     model['model'] = update_model(model['model'])
     torch.save(model['model'].state_dict(), new_model_path)
