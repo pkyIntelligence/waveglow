@@ -14,6 +14,7 @@ class Denoiser(torch.nn.Module):
         self.stft = STFT(filter_length=filter_length,
                          hop_length=int(filter_length/n_overlap),
                          win_length=win_length)
+
         if device.type == "cuda":
             self.stft.cuda()
 
@@ -32,6 +33,8 @@ class Denoiser(torch.nn.Module):
 
         with torch.no_grad():
             bias_audio = waveglow.infer(mel_input, sigma=0.0).float()
+            if device.type == "cuda":
+                bias_audio = bias_audio.cuda()
             bias_spec, _ = self.stft.transform(bias_audio)
 
         self.register_buffer('bias_spec', bias_spec[:, :, 0][:, :, None])
